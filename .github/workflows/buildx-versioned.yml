@@ -29,7 +29,7 @@ jobs:
         name: Prepare versioned image
         id: prepare-versioned
         run: |
-          DOCKER_IMAGE=syuan100/keep-core
+          DOCKER_IMAGE=syuan100/keep-ecdsa
           DOCKER_PLATFORMS=linux/arm64
           VERSION=${{ steps.keep-network.outputs.release }}
 
