@@ -1,0 +1,75 @@
+name: Push ARM64 image - Versioned
+
+on:
+  schedule:
+    - cron: '0 0/6 * * *' # runs every 6 hours
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Tags'
+
+jobs:
+  buildx:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Get latest release tag
+        id: keep-network
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+            owner: keep-network
+            repo: keep-ecdsa
+      -
+        name: Checkout latest release
+        uses: actions/checkout@v2
+        with:
+          ref: refs/tags/${{ steps.keep-network.outputs.release }}
+          fetch-depth: 0
+      -
+        name: Prepare versioned image
+        id: prepare-versioned
+        run: |
+          DOCKER_IMAGE=syuan100/keep-core
+          DOCKER_PLATFORMS=linux/arm64
+          VERSION=${{ steps.keep-network.outputs.release }}
+
+          TAGS="--tag ${DOCKER_IMAGE}:${VERSION}_arm64"
+
+          echo ::set-output name=docker_image::${DOCKER_IMAGE}
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
+            --build-arg VERSION=${VERSION} \
+            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+            --build-arg VCS_REF=${GITHUB_SHA::8} \
+            ${TAGS} --file ./Dockerfile .
+      -
+        name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v3
+      -
+        name: Docker Buildx (build)
+        run: |
+          docker buildx build --output "type=image,push=false" ${{ steps.prepare-versioned.outputs.buildx_args }}
+      -
+        name: Docker Login
+        if: success() && github.event_name != 'pull_request'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+      -
+        name: Docker Buildx (push)
+        if: success() && github.event_name != 'pull_request'
+        run: |
+          docker buildx build --output "type=image,push=true" ${{ steps.prepare-versioned.outputs.buildx_args }}
+      -
+        name: Docker Check Manifest
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          docker run --rm mplatform/mquery ${{ steps.prepare-versioned.outputs.docker_image }}:${{ steps.prepare-versioned.outputs.version }}_arm64
+      -
+        name: Clear
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          rm -f ${HOME}/.docker/config.json
+         
