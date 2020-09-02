@@ -25,13 +25,25 @@ jobs:
         with:
           ref: refs/tags/${{ steps.keep-network.outputs.release }}
           fetch-depth: 0
+      - 
+        name: Set version var
+        uses: allenevans/set-env@v1.0.0
+        with:
+          VER: '{{ steps.keep-network.outputs.release }}'
+        if: ${{ !github.event.inputs.tags }}
+      - 
+        name: Set version var
+        uses: allenevans/set-env@v1.0.0
+        with:
+          VER: '{{ github.event.inputs.tags }}'
+        if: ${{ github.event.inputs.tags }}
       -
         name: Prepare versioned image
         id: prepare-versioned
         run: |
           DOCKER_IMAGE=syuan100/keep-ecdsa
           DOCKER_PLATFORMS=linux/arm64
-          VERSION=${{ steps.keep-network.outputs.release }}
+          VERSION=${VER}
 
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}_arm64"
 
