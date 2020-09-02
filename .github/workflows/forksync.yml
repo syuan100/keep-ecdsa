@@ -25,7 +25,7 @@ jobs:
       - name: Update tags
         run: |
           git remote add upstream https://github.com/keep-network/keep-ecdsa.git
-          git fetch upstream
+          git fetch upstream --all --tags
           git pull
       - name: Push tags
         uses: ad-m/github-push-action@master
