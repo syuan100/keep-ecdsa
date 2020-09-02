@@ -25,17 +25,21 @@ jobs:
         with:
           ref: refs/tags/${{ steps.keep-network.outputs.release }}
           fetch-depth: 0
-      - 
+      -
+         run: echo "::debug::{{ github.event.inputs.tags }}"
+      -
         name: Set version var
         uses: allenevans/set-env@v1.0.0
         with:
           VER: '{{ steps.keep-network.outputs.release }}'
+          overwrite: true
         if: ${{ !github.event.inputs.tags }}
       - 
         name: Set version var
         uses: allenevans/set-env@v1.0.0
         with:
           VER: '{{ github.event.inputs.tags }}'
+          overwrite: true
         if: ${{ github.event.inputs.tags }}
       -
         name: Prepare versioned image
