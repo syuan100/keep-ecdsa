@@ -27,20 +27,20 @@ jobs:
           fetch-depth: 0
       -
          name: debug
-         run: echo "::debug::{{ github.event.inputs.tags }}"
+         run: echo "::debug::${{ github.event.inputs.tags }}"
       -
         name: Set version var
         uses: allenevans/set-env@v1.0.0
         with:
           overwrite: true
-          VER: '{{ steps.keep-network.outputs.release }}'
+          VER: ${{ steps.keep-network.outputs.release }}
         if: ${{ !github.event.inputs.tags }}
       - 
         name: Set version var
         uses: allenevans/set-env@v1.0.0
         with:
           overwrite: true
-          VER: '{{ github.event.inputs.tags }}'
+          VER: ${{ github.event.inputs.tags }}
         if: ${{ github.event.inputs.tags }}
       -
         name: Prepare versioned image
