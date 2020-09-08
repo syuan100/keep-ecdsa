@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
       - 
         name: Get Previous tag
-        id: previoustag
+        id: keep-network
         uses: WyriHaximus/github-action-get-previous-tag@master
       -
         name: Checkout latest release
