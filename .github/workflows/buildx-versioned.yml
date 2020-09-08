@@ -25,14 +25,14 @@ jobs:
         name: Checkout latest release
         uses: actions/checkout@v2
         with:
-          ref: refs/tags/${{ steps.keep-network.outputs.release }}
+          ref: refs/tags/${{ steps.keep-network.outputs.tag }}
           fetch-depth: 0
       -
         name: Set version var
         uses: allenevans/set-env@v1.0.0
         with:
           overwrite: true
-          VER: ${{ steps.keep-network.outputs.release }}
+          VER: ${{ steps.keep-network.outputs.tag }}
         if: ${{ !github.event.inputs.tags }}
       - 
         name: Set version var
