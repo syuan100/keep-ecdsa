@@ -29,17 +29,11 @@ jobs:
           fetch-depth: 0
       -
         name: Set version var
-        uses: allenevans/set-env@v1.0.0
-        with:
-          overwrite: true
-          VER: ${{ steps.keep-network.outputs.tag }}
+        run: echo "VER=${{steps.keep-network.outputs.tag}}" >> $GITHUB_ENV
         if: ${{ !github.event.inputs.tags }}
       - 
         name: Set version var
-        uses: allenevans/set-env@v1.0.0
-        with:
-          overwrite: true
-          VER: ${{ github.event.inputs.tags }}
+        run: echo "VER=${{github.event.inputs.tags}}" >> $GITHUB_ENV
         if: ${{ github.event.inputs.tags }}
       -
         name: Prepare versioned image
@@ -47,7 +41,7 @@ jobs:
         run: |
           DOCKER_IMAGE=syuan100/keep-ecdsa
           DOCKER_PLATFORMS=linux/arm64
-          VERSION=${VER}
+          VERSION=${$VER}
 
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}_arm64"
 
