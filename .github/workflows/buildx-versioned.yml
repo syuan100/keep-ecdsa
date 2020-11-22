@@ -41,7 +41,7 @@ jobs:
         run: |
           DOCKER_IMAGE=syuan100/keep-ecdsa
           DOCKER_PLATFORMS=linux/arm64
-          VERSION=${$VER}
+          VERSION=$VER
 
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}_arm64"
 
